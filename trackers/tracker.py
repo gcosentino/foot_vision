@@ -4,6 +4,8 @@ import pickle
 import os
 import sys
 import cv2
+import numpy as np
+import pandas as pd
 sys.path.append('../')
 from utils import get_center_of_bbox, get_bbox_width
 
@@ -133,7 +135,21 @@ class Tracker:
             return frame
 
 
-    def draw_annotations(self,video_frames, tracks,team_ball_control):
+    def draw_triangle(self,frame,bbox,color):
+        y= int(bbox[1])
+        x,_ = get_center_of_bbox(bbox)
+
+        triangle_points = np.array([
+            [x,y],
+            [x-10,y-20],
+            [x+10,y-20],
+        ])
+        cv2.drawContours(frame, [triangle_points],0,color, cv2.FILLED)
+        cv2.drawContours(frame, [triangle_points],0,(0,0,0), 2)
+
+        return frame
+    
+    def draw_annotations(self,video_frames, tracks):
         output_video_frames= []
         for frame_num, frame in enumerate(video_frames):
             frame = frame.copy()
@@ -160,7 +176,7 @@ class Tracker:
 
 
             # Draw Team Ball Control
-            frame = self.draw_team_ball_control(frame, frame_num, team_ball_control)
+            #frame = self.draw_team_ball_control(frame, frame_num, team_ball_control)
 
             output_video_frames.append(frame)
 
